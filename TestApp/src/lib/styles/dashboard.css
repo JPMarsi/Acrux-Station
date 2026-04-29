@@ -36,7 +36,7 @@ html, body {
   grid-template-columns: minmax(220px, 0.95fr) minmax(420px, 1.8fr) minmax(260px, 1.15fr);
   grid-template-rows: auto 1fr;
   grid-template-areas:
-    "team alerts terminal"
+    "team alerts right"
     "telemetry charts right";
   gap: 0;
   background: var(--line);
@@ -50,25 +50,21 @@ html, body {
   padding: 12px;
   overflow: hidden;
 }
-
 .team-panel { grid-area: team; }
 .alert-panel { grid-area: alerts; }
-.terminal-panel {
-  grid-area: terminal;
-  border-right: none;
-}
 .telemetry-panel { grid-area: telemetry; }
 .charts-panel { grid-area: charts; }
+
 .right-stack {
   grid-area: right;
   display: grid;
   grid-template-rows: auto auto 1fr;
   min-height: 0;
+  border-right: none;
 }
 
 .telemetry-panel,
-.charts-panel,
-.right-stack {
+.charts-panel {
   border-bottom: none;
 }
 
@@ -417,21 +413,18 @@ html, body {
     grid-template-areas:
       "team"
       "alerts"
-      "terminal"
       "telemetry"
       "charts"
       "right";
   }
 
   .panel,
-  .terminal-panel,
   .right-stack > .panel {
     border-right: none;
   }
 
   .team-panel,
   .alert-panel,
-  .terminal-panel,
   .telemetry-panel,
   .charts-panel {
     border-bottom: var(--border);
@@ -513,4 +506,52 @@ html, body {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+.command-status {
+  margin-top: 10px;
+  padding: 8px 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border: 1px solid rgba(47, 47, 47, 0.18);
+  background: #f4eadc;
+  color: #2b2b2b;
+}
+
+.command-status.success {
+  background: #dff3e7;
+  color: #1f5133;
+}
+
+.command-status.error {
+  background: #f8e0dc;
+  color: #7a2f23;
+}
+
+.custom-command-terminal {
+  min-height: 92px;
+  background: var(--accent);
+  border: 1px solid rgba(47, 47, 47, 0.18);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.custom-command-terminal p {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.custom-command-terminal p.success {
+  color: #1f5133;
+}
+
+.custom-command-terminal p.error {
+  color: #7a2f23;
 }

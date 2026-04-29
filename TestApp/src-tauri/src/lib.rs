@@ -15,7 +15,8 @@ pub fn run() {
         .manage(prueba::create_initial_state())
         .invoke_handler(tauri::generate_handler![
             greet,
-            prueba::commands::get_telemetry
+            prueba::commands::get_telemetry,
+            prueba::commands::send_custom_command
         ])
         .setup(|app| {
             println!("setup() called");
