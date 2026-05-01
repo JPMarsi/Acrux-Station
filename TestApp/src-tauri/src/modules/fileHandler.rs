@@ -180,3 +180,110 @@ pub fn file_csv_readLine_telemetry(id: u32, line: usize) -> Option<String> {
 
     lines.get(line).map(|s| s.to_string())
 }
+
+
+
+// --- TESTING ---
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+    use std::path::Path;
+
+    fn setup() {
+        let test_dir = "./test_data";
+        file_path(test_dir);
+    }
+
+    fn cleanup() {
+        std::fs::remove_dir_all("./test_data").ok();
+    }
+
+    #[test]
+    fn test_print() {
+        println!("print test");
+    }
+
+    #[test]
+    fn test_json_to_csv() {
+        let mut data = HashMap::new();
+        data.insert("a".to_string(), "1".to_string());
+        data.insert("b".to_string(), "2".to_string());
+
+        let csv = data_getHandle_from_json_to_csv(&data).unwrap();
+
+        assert!(csv.contains("1"));
+        assert!(csv.contains("2"));
+    }
+
+    #[test]
+    fn test_json_to_txt_var() {
+        let mut data = HashMap::new();
+        data.insert("temp".to_string(), "25".to_string());
+
+        let txt = data_get_from_json_to_txt(&data, "var").unwrap();
+
+        assert_eq!(txt, "temp = 25");
+    }
+
+    #[test]
+    fn test_json_to_txt_cmd() {
+        let mut data = HashMap::new();
+        data.insert("LED".to_string(), "ON".to_string());
+
+        let txt = data_get_from_json_to_txt(&data, "cmd").unwrap();
+
+        assert_eq!(txt, "LED ON");
+    }
+
+    #[test]
+    fn test_file_create() {
+        setup();
+
+        let file = file_csv_create("test.csv");
+
+        assert!(Path::new(&file).exists());
+
+        cleanup();
+    }
+
+    #[test]
+    fn test_create_telemetry_file() {
+        setup();
+
+        let file = file_csv_create_telemetry(1, 2);
+
+        assert!(Path::new(&file).exists());
+
+        cleanup();
+    }
+
+    #[test]
+    fn test_write_and_read() {
+        setup();
+
+        let id = 10;
+
+        file_csv_create_telemetry(id, 1);
+
+        file_csv_writeHeader_telemetry(id, "A,B,C");
+        file_csv_writeLine_telemetry(id, "1,2,3");
+
+        let line0 = file_csv_readLine_telemetry(id, 0).unwrap();
+        let line1 = file_csv_readLine_telemetry(id, 1).unwrap();
+
+        assert_eq!(line0, "A,B,C");
+        assert_eq!(line1, "1,2,3");
+
+        cleanup();
+    }
+
+    #[test]
+    fn test_timestamp_format() {
+        let ts = timestamp();
+
+        assert_eq!(ts.len(), 19);
+        assert!(ts.contains("_"));
+    }
+}
