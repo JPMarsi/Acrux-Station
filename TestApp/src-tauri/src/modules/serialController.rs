@@ -81,7 +81,7 @@ pub fn serial_read_to_json_telemetry() -> Option<HashMap<String, String>> {
 /*
 // serial_write_from_cmd_timeSetTime([hora,mins,segs])
 */
-pub fn serial_write_from_cmd_time_set_time(team_id: u8, time: [u8; 3]) {
+pub fn serial_write_from_cmd_time_set_time(team_id: u16, time: [u8; 3]) {
     unsafe {
         if let Some(port) = PORT.as_mut() {
             let cmd = format!("{:02}:{:02}:{:02}", time[0], time[1], time[2]);
@@ -97,7 +97,7 @@ pub fn serial_write_from_cmd_time_set_time(team_id: u8, time: [u8; 3]) {
 /*
 // serial_write_from_cmd_telemetry(equipo, estado)
 */
-pub fn serial_write_from_cmd_telemetry(team_id: u8, state: bool) {
+pub fn serial_write_from_cmd_telemetry(team_id: u16, state: bool) {
     unsafe {
         if let Some(port) = PORT.as_mut() {
             let cmd = if state { "ON" } else { "OFF" };
@@ -111,7 +111,7 @@ pub fn serial_write_from_cmd_telemetry(team_id: u8, state: bool) {
 /*
 // serial_write_from_cmd_mechanism(equipo, dispositivo, estado)
 */
-pub fn serial_write_from_cmd_mechanism(team_id: u8, device: Option<u8>, state: bool) {
+pub fn serial_write_from_cmd_mechanism(team_id: u16, device: Option<u8>, state: bool) {
     unsafe {
         if let Some(port) = PORT.as_mut() {
             let dev = match device {
@@ -130,7 +130,7 @@ pub fn serial_write_from_cmd_mechanism(team_id: u8, device: Option<u8>, state: b
 /*
 // serial_write_from_cmd_altitudeSetZero(equipo)
 */
-pub fn serial_write_from_cmd_altitude_set_zero(team_id: u8) {
+pub fn serial_write_from_cmd_altitude_set_zero(team_id: u16) {
     unsafe {
         if let Some(port) = PORT.as_mut() {
             let message = format!("CMD,{},CAL\r\n", team_id);

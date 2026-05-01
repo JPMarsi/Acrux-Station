@@ -2,44 +2,34 @@ use tauri::State;
 
 use super::state::AppState;
 use super::telemetry::Telemetry;
+use crate::modules::serialController;
 
 #[tauri::command]
 pub fn get_telemetry(state: State<AppState>) -> Telemetry {
-    println!("get_telemetry() called");
     state.telemetry.lock().unwrap().clone()
 }
 
-
 #[tauri::command]
-pub fn send_custom_command(command: String, state: State<AppState>) -> Result<String, String> {
-    let clean_command = command.trim().to_uppercase();
+pub fn send_custom_command(command: String, _state: State<AppState>) -> Result<String, String> {
+    let clean = command.trim().to_uppercase();
 
-    if clean_command.is_empty() {
+    if clean.is_empty() {
         return Err("El comando está vacío".into());
     }
 
-    let mut telemetry = state.telemetry.lock().unwrap();
-
-    match clean_command.as_str() {
-        "PING" => {
-            telemetry.cmd_echo = "PING_OK".into();
-            Ok("PONG".into())
+    match clean.as_str() {
+        "START TELEMETRY" => {
+            serialController::serial_write_from_cmd_telemetry(1234, true);
+            Ok("CMD,1234,CX,ON enviado".into())
         }
-        "RESET" => {
-            telemetry.state = "RESETTING".into();
-            telemetry.cmd_echo = "RESET".into();
-            Ok("Reset ejecutado".into())
+        "END TELEMETRY" => {
+            serialController::serial_write_from_cmd_telemetry(1234, false);
+            Ok("CMD,1234,CX,OFF enviado".into())
         }
-        "SAFE MODE" => {
-            telemetry.mode = "SAFE".into();
-            telemetry.cmd_echo = "SAFE MODE".into();
-            Ok("Modo seguro activado".into())
+        "CAL ALTITUDE" => {
+            serialController::serial_write_from_cmd_altitude_set_zero(1234);
+            Ok("CMD,1234,CAL enviado".into())
         }
-        "DEPLOY" => {
-            telemetry.state = "DEPLOY".into();
-            telemetry.cmd_echo = "DEPLOY".into();
-            Ok("Secuencia de despliegue activada".into())
-        }
-        _ => Err(format!("Comando no reconocido: {}", clean_command))
+        _ => Err(format!("Comando no mapeado todavía: {}", clean)),
     }
 }

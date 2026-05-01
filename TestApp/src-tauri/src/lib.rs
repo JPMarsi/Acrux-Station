@@ -1,4 +1,5 @@
 mod prueba;
+mod modules;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -8,8 +9,6 @@ fn greet(name: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    println!("run() called");
-
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(prueba::create_initial_state())
@@ -19,7 +18,6 @@ pub fn run() {
             prueba::commands::send_custom_command
         ])
         .setup(|app| {
-            println!("setup() called");
             prueba::setup(app);
             Ok(())
         })
