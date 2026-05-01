@@ -1,10 +1,5 @@
 mod prueba;
-<<<<<<< HEAD
 mod modules;
-=======
-mod fileHandler;
->>>>>>> ad004b9 (libs: fileHanler)
-
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
