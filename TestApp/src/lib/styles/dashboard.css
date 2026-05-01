@@ -1,4 +1,9 @@
-/*Generales*/
+/*
+--------------------------------------------------------------------------------------------------------------------------------
+Parametros iniciales de CSS para el dashboard de monitoreo de satélites. Define variables de color, tipografía y estilos básicos para 
+los paneles, alertas, telemetría y gráficos. El diseño es responsivo, adaptándose a diferentes tamaños de pantalla mediante media queries.
+--------------------------------------------------------------------------------------------------------------------------------
+*/
 :root {
   --bg: #f6f1e7;
   --panel: #ead1b2;
@@ -16,6 +21,8 @@
   --font-main: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --font-mono: "Consolas", "Courier New", monospace;
 }
+
+
 /*Sets 0 margin and padding*/
 * {
   box-sizing: border-box;
@@ -23,6 +30,11 @@
   padding: 0;
 }
 
+/*
+-------------------------------------------------------------------------------------------------------------------------------- 
+Define el fondo, color de texto y tipografía para el Background 
+-------------------------------------------------------------------------------------------------------------------------------- 
+*/
 html, body {
   min-height: 100vh;
   background: #ddd;
@@ -30,10 +42,18 @@ html, body {
   font-family: var(--font-main);
 }
 
+/*
+-------------------------------------------------------------------------------------------------------------------------------- 
+.dashboard es el contenedor principal del dashboard, que contiene a los paneles de telemetría, gráficos y alertas. 
+Utiliza CSS Grid para organizar su contenido en una estructura de 3 columnas y 2 filas, con áreas específicas para
+cada panel y cada sección.
+-------------------------------------------------------------------------------------------------------------------------------- 
+*/
+
 .dashboard {
   min-height: calc(100vh);
   display: grid;
-  grid-template-columns: minmax(220px, 0.95fr) minmax(420px, 1.8fr) minmax(260px, 1.15fr);
+  grid-template-columns: minmax(220px, 0.8fr) minmax(420px, 1.95fr) minmax(260px, 1.15fr);
   grid-template-rows: auto 1fr;
   grid-template-areas:
     "team alerts right"
@@ -55,6 +75,12 @@ html, body {
 .telemetry-panel { grid-area: telemetry; }
 .charts-panel { grid-area: charts; }
 
+/*
+-------------------------------------------------------------------------------------------------------------------------------- 
+Define el estilo del stack derecho del dashboard, contiene los botones, 
+el sendcostumcommand, por ultimo el render y gps. 
+-------------------------------------------------------------------------------------------------------------------------------- 
+*/
 .right-stack {
   grid-area: right;
   display: grid;
@@ -82,6 +108,13 @@ html, body {
   margin-bottom: 8px;
 }
 
+
+
+/*
+-------------------------------------------------------------------------------------------------------------------------------- 
+Team box Styles; En este espacio se define el estilo del panel del equipo, que incluye el logo y la información del equipo.
+-------------------------------------------------------------------------------------------------------------------------------- 
+*/
 .team-brand {
   display: flex;
   align-items: center;
@@ -116,6 +149,13 @@ html, body {
   letter-spacing: 0.12em;
 }
 
+
+/*
+-------------------------------------------------------------------------------------------------------------------------------- 
+Aleters box Styles; En este espacio se define el estilo del panel de alertas.
+-------------------------------------------------------------------------------------------------------------------------------- 
+*/
+
 .alert-panel {
   display: flex;
   flex-direction: column;
@@ -136,15 +176,11 @@ html, body {
   padding: 8px;
 }
 
-.terminal-window {
-  background: #a9dfbc;
-  border: 1px solid rgba(47, 47, 47, 0.25);
-  min-height: 56px;
-  padding: 10px;
-  font-family: var(--font-mono);
-  font-size: 0.84rem;
-  line-height: 1.45;
-}
+/*
+-------------------------------------------------------------------------------------------------------------------------------- 
+Telemetry box Styles; En este espacio se define el estilo del panel izquierdo de telemetría.
+-------------------------------------------------------------------------------------------------------------------------------- 
+*/
 
 .telemetry-panel {
   background: #e7e0a8;
@@ -179,6 +215,13 @@ html, body {
   color: #444;
   font-weight: 600;
 }
+
+/*
+-------------------------------------------------------------------------------------------------------------------------------- 
+Charts box Styles;  En este espacio se define el estilo del panel central de gráficos, que incluye el diseño de la cuadrícula para los gráficos,
+el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráficos.
+-------------------------------------------------------------------------------------------------------------------------------- 
+*/
 
 .charts-panel {
   padding: 8px;
