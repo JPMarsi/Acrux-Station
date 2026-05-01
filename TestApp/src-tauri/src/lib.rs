@@ -1,4 +1,4 @@
-mod prueba;
+mod telemetry;
 //mod modules;
 pub mod modules;
 
@@ -12,14 +12,14 @@ fn greet(name: &str) -> String {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .manage(prueba::create_initial_state())
+        .manage(telemetry::create_initial_state())
         .invoke_handler(tauri::generate_handler![
             greet,
-            prueba::commands::get_telemetry,
-            prueba::commands::send_custom_command
+            telemetry::commands::get_telemetry,
+            telemetry::commands::send_custom_command
         ])
         .setup(|app| {
-            prueba::setup(app);
+            telemetry::setup(app);
             Ok(())
         })
         .run(tauri::generate_context!())
