@@ -571,17 +571,21 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
 }
 
 .custom-command-terminal {
-  min-height: 92px;
+  min-height: 110px;
+  max-height: 110px;
+  overflow-y: auto;
   background: var(--accent);
   border: 1px solid rgba(47, 47, 47, 0.18);
   padding: 10px 12px;
   margin-bottom: 14px;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: flex-start;
+  gap: 6px;
   font-family: var(--font-mono);
   font-size: 0.9rem;
-  line-height: 1.4;
+  line-height: 1.35;
   color: var(--text);
 }
 
@@ -597,4 +601,21 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
 
 .custom-command-terminal p.error {
   color: #7a2f23;
+}
+.command-select {
+  width: 100%;
+  appearance: none;
+  border: 1px solid rgba(47, 47, 47, 0.18);
+  background: var(--accent);
+  color: #1f1f1f;
+  padding: 10px 12px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 42px;
+}
+
+.command-select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

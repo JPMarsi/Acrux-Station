@@ -8,7 +8,16 @@
 use serialport::SerialPort;
 use std::io::{Read, Write};
 use std::time::Duration;
+use serde::Serialize;
+use std::sync::Mutex;
 
+#[derive(Debug, Clone, Serialize)]
+pub struct SerialConfig {
+    pub selected_port: String,
+    pub baud_rate: u32,
+}
+
+static SERIAL_CONFIG: Mutex<Option<SerialConfig>> = Mutex::new(None);
 // puerto y buffer globales (similar a JS)
 static mut PORT: Option<Box<dyn SerialPort>> = None;
 
@@ -164,4 +173,41 @@ pub fn serial_read_line() -> Option<String> {
     }
 
     None
+}
+//funcion general de escritura
+pub fn serial_write_raw(line: &str) -> Result<(), String> {
+    unsafe {
+        if let Some(port) = PORT.as_mut() {
+            use std::io::Write;
+
+            let payload = format!("{}\n", line);
+            port.write_all(payload.as_bytes())
+                .map_err(|e| e.to_string())?;
+            port.flush().map_err(|e| e.to_string())?;
+            Ok(())
+        } else {
+            Err("Puerto serial no inicializado".into())
+        }
+    }
+}
+
+pub fn get_serial_config() -> SerialConfig {
+    let config = SERIAL_CONFIG.lock().unwrap();
+
+    config.clone().unwrap_or(SerialConfig {
+        selected_port: "COM6".into(),
+        baud_rate: 115200,
+    })
+}
+
+pub fn set_serial_config(port: String, baud_rate: u32) -> Result<SerialConfig, String> {
+    let new_config = SerialConfig {
+        selected_port: port,
+        baud_rate,
+    };
+
+    let mut config = SERIAL_CONFIG.lock().unwrap();
+    *config = Some(new_config.clone());
+
+    Ok(new_config)
 }
