@@ -16,6 +16,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             telemetry::commands::get_telemetry,
+            telemetry::commands::reset_app,
             telemetry::commands::send_custom_command,
         
             telemetry::commands::list_serial_ports,

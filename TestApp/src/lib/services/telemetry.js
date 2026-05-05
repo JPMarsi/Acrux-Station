@@ -22,6 +22,13 @@ export async function initTelemetry() {
   });
 }
 
+export async function resetTelemetrySession() {
+  const resetData = await invoke('reset_app');
+  telemetry.set(resetData);
+  telemetryHistory.reset();
+  return resetData;
+}
+
 export function destroyTelemetryListener() {
   if (unlisten) {
     unlisten();

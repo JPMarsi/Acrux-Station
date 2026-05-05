@@ -60,6 +60,12 @@ pub fn stop_telemetry() -> Result<String, String> {
     Ok(format!("Enviado: {}", line))
 }
 
+pub fn reset_serial_session() {
+    TELEMETRY_ACTIVE.store(false, Ordering::SeqCst);
+    SERIAL_OPENED.store(false, Ordering::SeqCst);
+    serialController::serial_close();
+}
+
 pub fn send_protocol_line(app: &AppHandle, line: &str) -> Result<String, String> {
     ensure_serial_ready(app)?;
 

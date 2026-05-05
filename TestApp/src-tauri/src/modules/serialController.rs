@@ -40,6 +40,13 @@ pub fn serial_init(port_path: &str, baud: u32) -> Result<(), Box<dyn std::error:
     Ok(())
 }
 
+pub fn serial_close() {
+    unsafe {
+        PORT = None;
+        VAR_TEXT_FROM_SERIAL_TO_RAW_TELEMETRY = None;
+    }
+}
+
 /* --- INPUTS --- */
 
 /*

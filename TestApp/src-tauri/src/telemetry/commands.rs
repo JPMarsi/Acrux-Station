@@ -1,10 +1,11 @@
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Emitter, State};
 use serialport::available_ports;
 
 
 use super::serial_service;
 use super::state::AppState;
 use super::telemetry::Telemetry;
+use crate::modules::fileHandler;
 use crate::modules::serialController::{self, SerialConfig};
 
 #[tauri::command]
@@ -41,6 +42,24 @@ pub fn send_custom_command(
     }
 
     Err(format!("Comando no reconocido: {}", clean))
+}
+
+#[tauri::command]
+pub fn reset_app(state: State<AppState>, app: AppHandle) -> Result<Telemetry, String> {
+    serial_service::reset_serial_session();
+
+    let telemetry = super::create_default_telemetry();
+    {
+        let mut stored = state.telemetry.lock().map_err(|e| e.to_string())?;
+        *stored = telemetry.clone();
+    }
+
+    fileHandler::file_path("./data");
+    fileHandler::file_csv_create_telemetry(1, 1234);
+
+    let _ = app.emit("telemetry-update", telemetry.clone());
+
+    Ok(telemetry)
 }
 
 
