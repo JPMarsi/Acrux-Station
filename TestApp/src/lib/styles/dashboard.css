@@ -1,160 +1,165 @@
-/*
---------------------------------------------------------------------------------------------------------------------------------
-Parametros iniciales de CSS para el dashboard de monitoreo de satélites. Define variables de color, tipografía y estilos básicos para 
-los paneles, alertas, telemetría y gráficos. El diseño es responsivo, adaptándose a diferentes tamaños de pantalla mediante media queries.
---------------------------------------------------------------------------------------------------------------------------------
-*/
 :root {
-  --bg: #f6f1e7;
-  --panel: #ead1b2;
-  --panel-soft: #efe0ca;
-  --accent: #b7e7cf;
-  --accent-2: #d4f1e2;
-  --line: #2f2f2f;
-  --text: #1f1f1f;
-  --muted: #5e5e5e;
-  --shadow: rgba(0, 0, 0, 0.08);
+  --bg: #e7edf2;
+  --surface: #f8fbfd;
+  --surface-strong: #ffffff;
+  --surface-warm: #f5f8df;
+  --surface-cool: #e8f4f8;
+  --surface-command: #dceff5;
+  --line: #17212b;
+  --line-soft: #60717d;
+  --text: #101820;
+  --muted: #314450;
+  --success: #0b6b3a;
+  --danger: #9b1c1c;
+  --warning: #f2c94c;
+  --warning-soft: #fff4bf;
+  --signal: #1d8aa8;
+  --shadow: rgba(16, 24, 32, 0.18);
 
-  --radius: 0px;
+  --radius: 8px;
   --border: 2px solid var(--line);
+  --border-thin: 1.5px solid var(--line);
 
   --font-main: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   --font-mono: "Consolas", "Courier New", monospace;
 }
 
-
-/*Sets 0 margin and padding*/
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/*
--------------------------------------------------------------------------------------------------------------------------------- 
-Define el fondo, color de texto y tipografía para el Background 
--------------------------------------------------------------------------------------------------------------------------------- 
-*/
-html, body {
-  min-height: 100vh;
-  background: #ddd;
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-main);
+  overflow: hidden;
 }
 
-/*
--------------------------------------------------------------------------------------------------------------------------------- 
-.dashboard es el contenedor principal del dashboard, que contiene a los paneles de telemetría, gráficos y alertas. 
-Utiliza CSS Grid para organizar su contenido en una estructura de 3 columnas y 2 filas, con áreas específicas para
-cada panel y cada sección.
--------------------------------------------------------------------------------------------------------------------------------- 
-*/
+body {
+  padding: 0.8vh;
+}
 
 .dashboard {
-  min-height: calc(100vh);
+  height: calc(100dvh - 1.6vh);
+  min-height: 0;
   display: grid;
-  grid-template-columns: minmax(220px, 0.8fr) minmax(420px, 1.95fr) minmax(260px, 1.15fr);
-  grid-template-rows: auto 1fr;
+  grid-template-columns: minmax(235px, 0.82fr) minmax(430px, 1.9fr) minmax(270px, 1.08fr);
+  grid-template-rows: minmax(72px, 13vh) minmax(0, 1fr);
   grid-template-areas:
     "team alerts right"
     "telemetry charts right";
-  gap: 0;
-  background: var(--line);
+  gap: 0.8vh;
+  background: var(--bg);
   border: var(--border);
+  border-radius: var(--radius);
+  padding: 0.8vh;
+  box-shadow: 0 8px 22px var(--shadow);
+  overflow: hidden;
 }
 
 .panel {
-  background: var(--panel);
-  border-right: var(--border);
-  border-bottom: var(--border);
-  padding: 12px;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: clamp(6px, 0.85vh, 10px);
   overflow: hidden;
+  min-height: 0;
 }
-.team-panel { grid-area: team; }
-.alert-panel { grid-area: alerts; }
-.telemetry-panel { grid-area: telemetry; }
-.charts-panel { grid-area: charts; }
 
-/*
--------------------------------------------------------------------------------------------------------------------------------- 
-Define el estilo del stack derecho del dashboard, contiene los botones, 
-el sendcostumcommand, por ultimo el render y gps. 
--------------------------------------------------------------------------------------------------------------------------------- 
-*/
+.team-panel {
+  grid-area: team;
+  background: var(--surface-strong);
+}
+
+.alert-panel {
+  grid-area: alerts;
+  background: var(--warning-soft);
+}
+
+.telemetry-panel {
+  grid-area: telemetry;
+  background: var(--surface-warm);
+}
+
+.charts-panel {
+  grid-area: charts;
+  background: var(--surface-strong);
+}
+
 .right-stack {
   grid-area: right;
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: minmax(0, 0.82fr) minmax(0, 0.96fr) minmax(0, 1fr);
+  gap: 0.8vh;
   min-height: 0;
-  border-right: none;
-}
-
-.telemetry-panel,
-.charts-panel {
-  border-bottom: none;
 }
 
 .panel-title {
-  font-size: clamp(1rem, 1.1vw, 1.4rem);
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(20px, 3vh, 28px);
+  width: 100%;
+  margin-bottom: clamp(4px, 0.7vh, 8px);
+  border-bottom: var(--border-thin);
+  color: var(--text);
+  font-size: clamp(0.76rem, 1.15vw, 1rem);
+  font-weight: 900;
+  letter-spacing: 0;
   text-align: center;
-  margin-bottom: 12px;
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .panel-title.small {
-  text-align: left;
-  font-size: 1rem;
-  margin-bottom: 8px;
+  justify-content: flex-start;
+  min-height: clamp(18px, 2.5vh, 24px);
+  font-size: clamp(0.72rem, 0.95vw, 0.9rem);
+  margin-bottom: 0.5vh;
 }
 
-
-
-/*
--------------------------------------------------------------------------------------------------------------------------------- 
-Team box Styles; En este espacio se define el estilo del panel del equipo, que incluye el logo y la información del equipo.
--------------------------------------------------------------------------------------------------------------------------------- 
-*/
 .team-brand {
   display: flex;
   align-items: center;
-  
+  gap: 0.8vw;
   height: 100%;
 }
 
 .team-logo {
+  flex: 0 0 clamp(48px, 5.8vw, 70px);
+  height: clamp(48px, 5.8vw, 70px);
   background-image: url('../components/Logo.png');
-  background-size: cover;
+  background-size: contain;
   background-repeat: no-repeat;
-  align-self: center;
-  width: 35%;
-  height: 100%;
+  background-position: center;
+  border: var(--border-thin);
+  border-radius: 6px;
+  background-color: #fff;
 }
 
-.team-info{
-    padding-left: 8px;
+.team-info {
+  min-width: 0;
 }
 
 .team-info h1 {
-  font-size: clamp(1.6rem, 2vw, 2.3rem);
-  font-weight: 400;
-  letter-spacing: 0.03em;
+  font-size: clamp(1.35rem, 2.2vw, 1.95rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
 }
 
 .team-info p {
   color: var(--muted);
-  font-size: 0.95rem;
-  margin-top: 4px;
+  font-size: clamp(0.72rem, 1vw, 0.92rem);
+  font-weight: 800;
+  margin-top: 0.4vh;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
 }
-
-
-/*
--------------------------------------------------------------------------------------------------------------------------------- 
-Aleters box Styles; En este espacio se define el estilo del panel de alertas.
--------------------------------------------------------------------------------------------------------------------------------- 
-*/
 
 .alert-panel {
   display: flex;
@@ -163,27 +168,26 @@ Aleters box Styles; En este espacio se define el estilo del panel de alertas.
 }
 
 .alert-strip {
-  min-height: 54px;
-  background: var(--panel-soft);
-  border: 1px dashed rgba(47, 47, 47, 0.35);
+  min-height: 0;
+  flex: 1;
+  background: var(--warning);
+  border: var(--border-thin);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: clamp(1rem, 1.3vw, 1.4rem);
-  color: #3c342b;
+  color: var(--text);
+  font-size: clamp(0.95rem, 1.5vw, 1.3rem);
+  font-weight: 900;
   text-align: center;
-  padding: 8px;
+  padding: 0.8vh 1vw;
 }
 
-/*
--------------------------------------------------------------------------------------------------------------------------------- 
-Telemetry box Styles; En este espacio se define el estilo del panel izquierdo de telemetría.
--------------------------------------------------------------------------------------------------------------------------------- 
-*/
+.alert-strip:empty::before {
+  content: "SIN ALERTAS CRITICAS";
+}
 
 .telemetry-panel {
-  background: #e7e0a8;
   display: flex;
   flex-direction: column;
 }
@@ -191,130 +195,140 @@ Telemetry box Styles; En este espacio se define el estilo del panel izquierdo de
 .telemetry-list {
   list-style: none;
   display: grid;
-  gap: 5px;
+  grid-template-rows: repeat(23, minmax(0, 1fr));
+  gap: clamp(2px, 0.35vh, 4px);
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  padding-right: 0;
   font-family: var(--font-mono);
-  font-size: clamp(0.82rem, 0.85vw, 1rem);
-  line-height: 1.2;
-  overflow: auto;
-  padding-right: 4px;
+  font-size: clamp(0.58rem, 0.78vw, 0.86rem);
+  line-height: 1.05;
 }
 
 .telemetry-list li {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  border-bottom: 1px dotted rgba(47, 47, 47, 0.15);
-  padding-bottom: 2px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(62px, auto);
+  gap: 6px;
+  align-items: center;
+  min-height: 0;
+  padding: 1px 5px;
+  border: 1px solid rgba(16, 24, 32, 0.35);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.62);
 }
 
 .telemetry-list span {
-  color: #232323;
+  color: var(--text);
+  font-weight: 900;
 }
 
 .telemetry-list strong {
-  color: #444;
-  font-weight: 600;
+  color: var(--text);
+  font-weight: 900;
+  text-align: right;
+  word-break: break-word;
 }
 
-/*
--------------------------------------------------------------------------------------------------------------------------------- 
-Charts box Styles;  En este espacio se define el estilo del panel central de gráficos, que incluye el diseño de la cuadrícula para los gráficos,
-el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráficos.
--------------------------------------------------------------------------------------------------------------------------------- 
-*/
-
 .charts-panel {
-  padding: 8px;
+  padding: clamp(6px, 0.8vh, 9px);
 }
 
 .chart-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(180px, 1fr));
-  grid-template-rows: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 0.8vh;
   height: 100%;
   min-height: 0;
 }
 
 .chart-card {
-  background: transparent;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  background: var(--surface-strong);
+  border: var(--border-thin);
+  border-radius: 7px;
+  padding: clamp(4px, 0.55vh, 7px);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: clamp(18px, 2.5vh, 26px);
+  margin-bottom: 0.45vh;
+  border-bottom: 1px solid var(--line-soft);
 }
 
 .chart-title {
-  font-size: 0.95rem;
-  font-weight: 400;
-  margin-bottom: 6px;
-  padding-left: 4px;
+  color: var(--text);
+  font-size: clamp(0.72rem, 0.9vw, 0.9rem);
+  font-weight: 900;
 }
 
-.chart-placeholder {
+.chart-value {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: clamp(0.68rem, 0.86vw, 0.86rem);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.chart-canvas-wrap {
   flex: 1;
-  min-height: 120px;
-  background: #a9dfbc;
-  border: 1px solid rgba(47, 47, 47, 0.18);
-  position: relative;
-  overflow: hidden;
-}
-
-.chart-placeholder::before,
-.chart-placeholder::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.chart-placeholder::before {
+  min-height: 0;
+  height: 100%;
   background:
-    linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px);
-  background-size: 28px 28px;
+    linear-gradient(to right, rgba(16, 24, 32, 0.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 24, 32, 0.10) 1px, transparent 1px),
+    #ffffff;
+  background-size: 32px 32px;
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  padding: clamp(3px, 0.45vh, 6px);
 }
 
-.chart-placeholder::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255,255,255,0.08) 50%,
-    transparent 100%
-  );
-  transform: translateX(-100%);
+.chart-canvas-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .right-stack > .panel {
   border-right: none;
 }
 
-.commands-panel {
-  border-bottom: var(--border);
-}
-
 .commands-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55vh 0.55vw;
+  height: calc(100% - clamp(24px, 3.7vh, 36px));
 }
 
 .commands-grid button,
-.command-form button {
+.command-form button,
+.command-select {
+  min-height: 0;
   appearance: none;
-  border: 1px solid rgba(47, 47, 47, 0.18);
-  background: var(--accent);
-  color: #1f1f1f;
-  padding: 10px 12px;
-  font-size: 0.84rem;
-  font-weight: 500;
+  border: var(--border-thin);
+  background: var(--surface-command);
+  color: var(--text);
+  padding: 0.5vh 0.65vw;
+  border-radius: 6px;
+  font-size: clamp(0.62rem, 0.78vw, 0.82rem);
+  font-weight: 900;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  text-transform: uppercase;
+  transition: background 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease;
 }
 
 .commands-grid button:hover,
-.command-form button:hover {
-  background: var(--accent-2);
-  box-shadow: 0 2px 8px var(--shadow);
+.command-form button:hover,
+.command-select:hover {
+  background: #bfeeff;
+  box-shadow: inset 0 0 0 2px #ffffff;
 }
 
 .commands-grid button:active,
@@ -322,35 +336,96 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
   transform: translateY(1px);
 }
 
-.custom-command-panel {
-  border-bottom: var(--border);
+.commands-grid button:disabled,
+.command-form button:disabled,
+.command-select:disabled {
+  background: #dbe3e8;
+  color: #4b5563;
+  cursor: not-allowed;
 }
 
 .command-form {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 10px;
+  gap: 0.55vw;
 }
 
 .command-form input {
   width: 100%;
-  border: 1px solid rgba(47, 47, 47, 0.18);
-  background: var(--accent);
-  padding: 10px 12px;
-  font-size: 0.95rem;
+  min-height: clamp(30px, 4.3vh, 42px);
+  border: var(--border-thin);
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 0.6vh 0.7vw;
   color: var(--text);
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 0.9vw, 0.9rem);
+  font-weight: 800;
   outline: none;
 }
 
+.command-form input:focus {
+  box-shadow: inset 0 0 0 3px var(--warning);
+}
+
 .command-form input::placeholder {
-  color: #4b6458;
+  color: #3f4d5a;
+}
+
+.custom-command-terminal {
+  height: calc(100% - clamp(64px, 8.8vh, 86px));
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  background: #ffffff;
+  border: var(--border-thin);
+  border-radius: 6px;
+  padding: 0.7vh 0.7vw;
+  margin-bottom: 0.7vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.35vh;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: clamp(0.66rem, 0.82vw, 0.85rem);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.custom-command-terminal p {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.custom-command-terminal p.success,
+.command-status.success {
+  color: var(--success);
+}
+
+.custom-command-terminal p.error,
+.command-status.error {
+  color: var(--danger);
+}
+
+.command-status {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #ffffff;
+  border: var(--border-thin);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 900;
 }
 
 .bottom-right-panel {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 0.6vw;
   min-height: 0;
+  background: var(--surface-cool);
 }
 
 .render-card,
@@ -360,11 +435,13 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
   min-height: 0;
 }
 
-.render-placeholder {
+.render-placeholder,
+.gps-placeholder {
   flex: 1;
-  min-height: 170px;
-  background: #a9dfbc;
-  border: 1px solid rgba(47, 47, 47, 0.18);
+  min-height: 0;
+  background: #ffffff;
+  border: var(--border-thin);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -373,28 +450,28 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
 
 .satellite-shape {
   position: relative;
-  width: 74px;
-  height: 74px;
+  width: min(8vh, 84px);
+  height: min(8vh, 84px);
 }
 
 .satellite-shape .body {
   position: absolute;
-  top: 18px;
-  left: 25px;
-  width: 24px;
-  height: 38px;
-  background: #65766c;
-  border: 2px solid #2f2f2f;
+  top: 24%;
+  left: 33%;
+  width: 34%;
+  height: 52%;
+  background: #324553;
+  border: var(--border-thin);
 }
 
 .satellite-shape .panel-left,
 .satellite-shape .panel-right {
   position: absolute;
-  top: 24px;
-  width: 22px;
-  height: 26px;
-  background: #dbe9e2;
-  border: 2px solid #2f2f2f;
+  top: 33%;
+  width: 31%;
+  height: 36%;
+  background: #d9f3ff;
+  border: var(--border-thin);
 }
 
 .satellite-shape .panel-left {
@@ -405,33 +482,25 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
   right: 0;
 }
 
-.gps-placeholder {
-  flex: 1;
-  min-height: 170px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .gps-ring {
-  width: min(100%, 190px);
+  width: min(100%, 18vh, 190px);
   aspect-ratio: 1;
   border-radius: 50%;
   background:
-    radial-gradient(circle at center, rgba(255,255,255,0.15) 0 8%, transparent 8% 100%),
-    radial-gradient(circle, transparent 0 32%, rgba(47,47,47,0.14) 32% 33%, transparent 33% 66%, rgba(47,47,47,0.14) 66% 67%, transparent 67% 100%),
-    #a9dfbc;
-  border: 1px solid rgba(47, 47, 47, 0.18);
+    radial-gradient(circle at center, var(--warning) 0 7%, transparent 7% 100%),
+    radial-gradient(circle, transparent 0 32%, rgba(16, 24, 32, 0.24) 32% 33%, transparent 33% 66%, rgba(16, 24, 32, 0.24) 66% 67%, transparent 67% 100%),
+    #ffffff;
+  border: var(--border-thin);
   position: relative;
 }
 
 .gps-point {
   position: absolute;
-  width: 9px;
-  height: 9px;
-  background: #20543b;
+  width: 12px;
+  height: 12px;
+  background: var(--text);
+  border: 2px solid var(--warning);
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.45);
 }
 
 .p1 { top: 28%; left: 62%; }
@@ -441,16 +510,20 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
 
 @media (max-width: 1100px) {
   .dashboard {
-    grid-template-columns: minmax(220px, 0.9fr) minmax(360px, 1.5fr) minmax(250px, 1fr);
-  }
-
-  .commands-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(230px, 0.9fr) minmax(380px, 1.5fr) minmax(260px, 1fr);
   }
 }
 
 @media (max-width: 900px) {
+  html,
+  body {
+    height: auto;
+    overflow: auto;
+  }
+
   .dashboard {
+    height: auto;
+    min-height: 100dvh;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     grid-template-areas:
@@ -473,13 +546,14 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
     border-bottom: var(--border);
   }
 
-  .right-stack {
-    border-bottom: none;
-  }
-
   .chart-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(6, minmax(150px, 1fr));
+    grid-template-rows: repeat(6, minmax(170px, 1fr));
+  }
+
+  .telemetry-list {
+    height: auto;
+    overflow: visible;
   }
 
   .bottom-right-panel {
@@ -500,122 +574,22 @@ el estilo de las tarjetas de gráficos y el estilo de los placeholders de gráfi
     align-items: flex-start;
   }
 
+  .team-logo {
+    flex-basis: 64px;
+    height: 64px;
+  }
+
   .team-info h1 {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
   }
 
   .commands-grid,
-  .command-form {
+  .command-form,
+  .telemetry-list li {
     grid-template-columns: 1fr;
   }
 
-  .telemetry-list li {
-    flex-direction: column;
-    gap: 2px;
+  .telemetry-list strong {
+    text-align: left;
   }
-}
-.chart-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 6px;
-  padding: 0 4px;
-}
-
-.chart-value {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #2b2b2b;
-  font-family: var(--font-mono);
-}
-
-.chart-canvas-wrap {
-  flex: 1;
-  min-height: 120px;
-  height: 100%;
-  background: #f7f3ea;
-  border: 1px solid rgba(47, 47, 47, 0.18);
-  padding: 8px;
-}
-
-.chart-canvas-wrap canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.chart-card {
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-.command-status {
-  margin-top: 10px;
-  padding: 8px 10px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  border: 1px solid rgba(47, 47, 47, 0.18);
-  background: #f4eadc;
-  color: #2b2b2b;
-}
-
-.command-status.success {
-  background: #dff3e7;
-  color: #1f5133;
-}
-
-.command-status.error {
-  background: #f8e0dc;
-  color: #7a2f23;
-}
-
-.custom-command-terminal {
-  min-height: 110px;
-  max-height: 110px;
-  overflow-y: auto;
-  background: var(--accent);
-  border: 1px solid rgba(47, 47, 47, 0.18);
-  padding: 10px 12px;
-  margin-bottom: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  line-height: 1.35;
-  color: var(--text);
-}
-
-.custom-command-terminal p {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.custom-command-terminal p.success {
-  color: #1f5133;
-}
-
-.custom-command-terminal p.error {
-  color: #7a2f23;
-}
-.command-select {
-  width: 100%;
-  appearance: none;
-  border: 1px solid rgba(47, 47, 47, 0.18);
-  background: var(--accent);
-  color: #1f1f1f;
-  padding: 10px 12px;
-  font-size: 0.84rem;
-  font-weight: 500;
-  cursor: pointer;
-  min-height: 42px;
-}
-
-.command-select:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }

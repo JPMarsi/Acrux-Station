@@ -44,10 +44,10 @@
             data: values,
             borderColor: color,
             backgroundColor: `${color}22`,
-            borderWidth: 2.5,
+            borderWidth: 3.5,
             pointRadius: 0,
-            pointHoverRadius: 4,
-            tension: 0.28,
+            pointHoverRadius: 5,
+            tension: 0.2,
             fill: true
           }
         ]
@@ -65,11 +65,11 @@
             display: false
           },
           tooltip: {
-            backgroundColor: '#f6f1e7',
-            titleColor: '#1f1f1f',
-            bodyColor: '#1f1f1f',
-            borderColor: '#2f2f2f',
-            borderWidth: 1,
+            backgroundColor: '#ffffff',
+            titleColor: '#101820',
+            bodyColor: '#101820',
+            borderColor: '#101820',
+            borderWidth: 2,
             displayColors: false,
             callbacks: {
               label: (context) => `${context.parsed.y}${unit}`
@@ -79,32 +79,36 @@
         scales: {
           x: {
             grid: {
-              color: 'rgba(47, 47, 47, 0.10)'
+              color: 'rgba(16, 24, 32, 0.18)'
             },
             ticks: {
-              color: '#3a3a3a',
+              color: '#101820',
               maxTicksLimit: 5,
               font: {
-                size: 10
+                size: 11,
+                weight: 'bold'
               }
             },
             border: {
-              color: '#2f2f2f'
+              color: '#101820',
+              width: 2
             }
           },
           y: {
             grid: {
-              color: 'rgba(47, 47, 47, 0.10)'
+              color: 'rgba(16, 24, 32, 0.18)'
             },
             ticks: {
-              color: '#3a3a3a',
+              color: '#101820',
               maxTicksLimit: 5,
               font: {
-                size: 10
+                size: 11,
+                weight: 'bold'
               }
             },
             border: {
-              color: '#2f2f2f'
+              color: '#101820',
+              width: 2
             }
           }
         }

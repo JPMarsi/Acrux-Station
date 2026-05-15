@@ -51,5 +51,5 @@ pub fn setup(_app: &tauri::App) {
     println!("Inicializando app sin abrir serial...");
 
     fileHandler::file_path("./data");
-    fileHandler::file_csv_create_telemetry(1, 1234);
+    fileHandler::file_csv_stop_recording();
 }
