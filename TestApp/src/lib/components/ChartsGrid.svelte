@@ -9,7 +9,7 @@
       title="Altitude"
       labels={$telemetryHistory.labels}
       values={$telemetryHistory.altitude}
-      color="#0f766e"
+      color="#005f73"
       unit=" m"
     />
 
@@ -17,7 +17,7 @@
       title="Temperature"
       labels={$telemetryHistory.labels}
       values={$telemetryHistory.temperature}
-      color="#c2410c"
+      color="#b91c1c"
       unit=" °C"
     />
 
@@ -25,7 +25,7 @@
       title="Pressure"
       labels={$telemetryHistory.labels}
       values={$telemetryHistory.pressure}
-      color="#7c3aed"
+      color="#6d28d9"
       unit=" hPa"
     />
 
@@ -33,7 +33,7 @@
       title="Voltage"
       labels={$telemetryHistory.labels}
       values={$telemetryHistory.voltage}
-      color="#15803d"
+      color="#047857"
       unit=" V"
     />
 
@@ -41,7 +41,7 @@
       title="Current"
       labels={$telemetryHistory.labels}
       values={$telemetryHistory.current}
-      color="#b45309"
+      color="#9a3412"
       unit=" A"
     />
 
@@ -49,7 +49,7 @@
       title="GPS Altitude"
       labels={$telemetryHistory.labels}
       values={$telemetryHistory.gps_altitude}
-      color="#1f2937"
+      color="#111827"
       unit=" m"
     />
   </div>

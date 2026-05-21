@@ -33,7 +33,7 @@ pub fn start_serial_telemetry_reader(app: &AppHandle) {
 
                         let _ = app_handle.emit("telemetry-update", telemetry);
 
-                        fileHandler::file_csv_writeLine_telemetry(1, clean);
+                        fileHandler::file_csv_writeLine_telemetry_if_recording(1, clean);
                     } else {
                         println!("No se pudo parsear telemetría: {}", clean);
                     }

@@ -15,6 +15,7 @@ lazy_static::lazy_static! {
     static ref BASE_PATH: Mutex<String> = Mutex::new("./data".to_string());
 
     static ref TELEMETRY_FILES: Mutex<HashMap<u32, String>> = Mutex::new(HashMap::new());
+    static ref TELEMETRY_RECORDING_ACTIVE: Mutex<bool> = Mutex::new(false);
 }
 
 // =========================
@@ -133,6 +134,52 @@ pub fn file_csv_create_telemetry(id: u32, team: u32) -> String {
     full.to_string_lossy().to_string()
 }
 
+pub fn file_csv_create_flight_telemetry(id: u32, team: u32) -> String {
+    let name = format!("Flight_{}.csv", team);
+
+    let base = BASE_PATH.lock().unwrap();
+    let mut full = PathBuf::from(base.as_str());
+    full.push(&name);
+
+    fs::write(&full, "").unwrap();
+
+    TELEMETRY_FILES
+        .lock()
+        .unwrap()
+        .insert(id, full.to_string_lossy().to_string());
+
+    full.to_string_lossy().to_string()
+}
+
+pub fn file_csv_start_recording(id: u32, team: u32, format: &str) -> Result<String, String> {
+    file_path("./data");
+
+    let file = match format.to_ascii_lowercase().as_str() {
+        "session" | "local" | "timestamp" => file_csv_create_telemetry(id, team),
+        "mission" | "flight" => file_csv_create_flight_telemetry(id, team),
+        _ => {
+            return Err(format!(
+                "Formato CSV no reconocido: {}. Usar SESSION o MISSION",
+                format
+            ));
+        }
+    };
+
+    let mut active = TELEMETRY_RECORDING_ACTIVE.lock().unwrap();
+    *active = true;
+
+    Ok(file)
+}
+
+pub fn file_csv_stop_recording() {
+    let mut active = TELEMETRY_RECORDING_ACTIVE.lock().unwrap();
+    *active = false;
+}
+
+pub fn file_csv_is_recording() -> bool {
+    *TELEMETRY_RECORDING_ACTIVE.lock().unwrap()
+}
+
 pub fn file_csv_writeHeader_telemetry(id: u32, header: &str) {
     let files = TELEMETRY_FILES.lock().unwrap();
     let file = match files.get(&id) {
@@ -167,6 +214,12 @@ pub fn file_csv_writeLine_telemetry(id: u32, line: &str) {
         .unwrap()
         .write_all(content.as_bytes())
         .unwrap();
+}
+
+pub fn file_csv_writeLine_telemetry_if_recording(id: u32, line: &str) {
+    if file_csv_is_recording() {
+        file_csv_writeLine_telemetry(id, line);
+    }
 }
 
 use std::io::Write;

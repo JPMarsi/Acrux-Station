@@ -8,6 +8,9 @@ use super::telemetry::Telemetry;
 use crate::modules::fileHandler;
 use crate::modules::serialController::{self, SerialConfig};
 
+const TELEMETRY_FILE_ID: u32 = 1;
+const TEAM_ID: u32 = 1234;
+
 #[tauri::command]
 pub fn get_telemetry(state: State<AppState>) -> Telemetry {
     state.telemetry.lock().unwrap().clone()
@@ -37,11 +40,39 @@ pub fn send_custom_command(
         return serial_service::stop_telemetry();
     }
 
+    if clean.to_uppercase().starts_with("CSV ") {
+        return handle_csv_command(clean);
+    }
+
     if clean.to_uppercase().starts_with("CMD,") {
         return serial_service::send_protocol_line(&app, clean);
     }
 
     Err(format!("Comando no reconocido: {}", clean))
+}
+
+fn handle_csv_command(command: &str) -> Result<String, String> {
+    let normalized = command.to_ascii_uppercase();
+    let parts: Vec<&str> = normalized.split_whitespace().collect();
+
+    match parts.as_slice() {
+        ["CSV", "START", format] => {
+            let file = fileHandler::file_csv_start_recording(
+                TELEMETRY_FILE_ID,
+                TEAM_ID,
+                format,
+            )?;
+            Ok(format!("Guardado CSV activado en formato {}: {}", format, file))
+        }
+        ["CSV", "STOP"] => {
+            fileHandler::file_csv_stop_recording();
+            Ok("Guardado CSV detenido".into())
+        }
+        _ => Err(
+            "Comando CSV invalido. Usar: CSV START SESSION, CSV START MISSION o CSV STOP"
+                .into(),
+        ),
+    }
 }
 
 #[tauri::command]
@@ -55,7 +86,7 @@ pub fn reset_app(state: State<AppState>, app: AppHandle) -> Result<Telemetry, St
     }
 
     fileHandler::file_path("./data");
-    fileHandler::file_csv_create_telemetry(1, 1234);
+    fileHandler::file_csv_stop_recording();
 
     let _ = app.emit("telemetry-update", telemetry.clone());
 
