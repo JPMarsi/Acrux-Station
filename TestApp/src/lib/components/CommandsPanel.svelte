@@ -42,6 +42,21 @@
       console.error('Error loading serial config:', error);
     }
   });
+  async function refreshPorts() {
+  try {
+    availablePorts = await listSerialPorts();
+
+    commandConsole.push(
+      `[OK] ${availablePorts.length} puertos encontrados`,
+      'success'
+    );
+  } catch (error) {
+    commandConsole.push(
+      `[ERROR] ${String(error)}`,
+      'error'
+    );
+  }
+}
 
   async function handleCommand(command: string) {
     if (!command) return;
@@ -84,6 +99,7 @@
     <select
       class="command-select"
       bind:value={selectedPort}
+      on:click={refreshPorts}
       on:change={handlePortChange}
       disabled={$commandConsole.loading}
     >
