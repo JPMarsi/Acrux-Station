@@ -1,4 +1,4 @@
-pub mod commands;
+pub mod ui_runtime;
 pub mod parser;
 pub mod protocol;
 pub mod serial_runtime;

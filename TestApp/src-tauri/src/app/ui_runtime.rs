@@ -99,7 +99,17 @@ pub fn list_serial_ports() -> Result<Vec<String>, String> {
     let ports = available_ports()
         .map_err(|e| format!("No se pudieron listar puertos: {}", e))?;
 
-    Ok(ports.into_iter().map(|p| p.port_name).collect())
+    let filtered = ports
+        .into_iter()
+        .map(|p| p.port_name)
+        .filter(|name| {
+            name.starts_with("COM")
+                || name.contains("ttyUSB")
+                || name.contains("ttyACM")
+        })
+        .collect();
+
+    Ok(filtered)
 }
 
 #[tauri::command]
