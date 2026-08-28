@@ -1,7 +1,9 @@
 use std::sync::Mutex;
 
-use super::telemetry::Telemetry;
+use super::container_telemetry::ContainerTelemetry;
+use super::pocketqube_telemetry::PocketQubeTelemetry;
 
 pub struct AppState {
-    pub telemetry: Mutex<Telemetry>,
+    pub container_telemetry: Mutex<ContainerTelemetry>,
+    pub pocketqube_telemetry: Mutex<PocketQubeTelemetry>,
 }

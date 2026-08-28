@@ -1,0 +1,36 @@
+use serde::Serialize;
+
+/// Paquete oficial 2027 del PocketQube (30 campos base).
+#[derive(Debug, Clone, Serialize)]
+pub struct PocketQubeTelemetry {
+    pub id: String,
+    pub mode: String,
+    pub mission_time: String,
+    pub packet_count: u32,
+    pub command_count: u32,
+    pub altitude: f32,
+    pub temperature: f32,
+    pub pressure: f32,
+    pub voltage: f32,
+    pub current: f32,
+    pub gnss_time: String,
+    pub gnss_altitude: f32,
+    pub gnss_latitude: f64,
+    pub gnss_longitude: f64,
+    pub gnss_sats: u8,
+    pub rot_rate_x: f32,
+    pub rot_rate_y: f32,
+    pub rot_rate_z: f32,
+    pub accel_x: f32,
+    pub accel_y: f32,
+    pub accel_z: f32,
+    pub mag_x: f32,
+    pub mag_y: f32,
+    pub mag_z: f32,
+    pub solar_1: f32,
+    pub solar_2: f32,
+    pub mech_state: String,
+    pub cmd_echo: String,
+    pub image_stabilization: String,
+    pub science_exp: String,
+}

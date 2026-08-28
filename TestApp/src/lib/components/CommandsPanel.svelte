@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import { executeProtocolCommand } from '../services/commandExecutor';
   import { commandConsole } from '../stores/commandConsole';
+  import { csvRecording } from '../stores/csvRecording';
+  import { linkStatus } from '../stores/linkStatus';
   import {
     listSerialPorts,
     getSerialConfig,
@@ -28,16 +30,20 @@
   const baudOptions = [9600, 19200, 38400, 57600, 115200];
 
   let availablePorts: string[] = [];
-  let selectedPort = 'COM6';
-  let selectedBaud = 115200;
+  let espnowPort = 'COM6';
+  let espnowBaud = 115200;
+  let xbeePort = 'COM7';
+  let xbeeBaud = 115200;
 
   onMount(async () => {
     try {
       availablePorts = await listSerialPorts();
 
       const config = await getSerialConfig();
-      selectedPort = config.selected_port;
-      selectedBaud = config.baud_rate;
+      espnowPort = config.espnow_port;
+      espnowBaud = config.espnow_baud_rate;
+      xbeePort = config.xbee_port;
+      xbeeBaud = config.xbee_baud_rate;
     } catch (error) {
       console.error('Error loading serial config:', error);
     }
@@ -63,19 +69,24 @@
     await executeProtocolCommand(command);
   }
 
-  async function handlePortChange() {
-    try {
-      await setSerialConfig(selectedPort, selectedBaud);
-      commandConsole.push(`[OK] Puerto seleccionado: ${selectedPort}`, 'success');
-    } catch (error) {
-      commandConsole.push(`[ERROR] ${String(error)}`, 'error');
+  async function handleCsvToggle() {
+    if ($csvRecording.active) {
+      await executeProtocolCommand('CSV STOP');
+      return;
     }
+
+    await executeProtocolCommand('CSV START');
   }
 
-  async function handleBaudChange() {
+  async function saveSerialConfig() {
     try {
-      await setSerialConfig(selectedPort, selectedBaud);
-      commandConsole.push(`[OK] Baudrate seleccionado: ${selectedBaud}`, 'success');
+      await setSerialConfig({
+        espnow_port: espnowPort,
+        espnow_baud_rate: espnowBaud,
+        xbee_port: xbeePort,
+        xbee_baud_rate: xbeeBaud
+      });
+      commandConsole.push(`[OK] Enlaces configurados: ESP-NOW ${espnowPort} | XBEE ${xbeePort}`, 'success');
     } catch (error) {
       commandConsole.push(`[ERROR] ${String(error)}`, 'error');
     }
@@ -96,31 +107,43 @@
       </button>
     {/each}
 
-    <select
-      class="command-select"
-      bind:value={selectedPort}
-      on:click={refreshPorts}
-      on:change={handlePortChange}
+    <button
+      type="button"
+      class="csv-toggle"
+      class:recording={$csvRecording.active}
+      on:click={handleCsvToggle}
       disabled={$commandConsole.loading}
+      title={$csvRecording.active ? 'Detener grabación CSV' : 'Iniciar grabación CSV'}
     >
-      {#if availablePorts.length === 0}
-        <option value={selectedPort}>No ports</option>
-      {:else}
-        {#each availablePorts as port}
-          <option value={port}>{port}</option>
-        {/each}
-      {/if}
-    </select>
+      CSV
+    </button>
 
-    <select
-      class="command-select"
-      bind:value={selectedBaud}
-      on:change={handleBaudChange}
-      disabled={$commandConsole.loading}
-    >
-      {#each baudOptions as baud}
-        <option value={baud}>{baud}</option>
-      {/each}
-    </select>
+    <div class="link-config">
+      <label
+        for="espnow-port"
+        class:active={$linkStatus.container_source === 'ESP-NOW' || $linkStatus.pocketqube_source === 'ESP-NOW'}
+        title={$linkStatus.espnow_connected ? 'ESP-NOW conectado' : 'ESP-NOW desconectado'}
+      >ESP-NOW</label>
+      <select id="espnow-port" class="command-select" bind:value={espnowPort} on:click={refreshPorts} on:change={saveSerialConfig} disabled={$commandConsole.loading}>
+        {#if availablePorts.length === 0}<option value={espnowPort}>No ports</option>{:else}{#each availablePorts as port}<option value={port}>{port}</option>{/each}{/if}
+      </select>
+      <select class="command-select" aria-label="Baudrate ESP-NOW" bind:value={espnowBaud} on:change={saveSerialConfig} disabled={$commandConsole.loading}>
+        {#each baudOptions as baud}<option value={baud}>{baud}</option>{/each}
+      </select>
+    </div>
+
+    <div class="link-config">
+      <label
+        for="xbee-port"
+        class:active={$linkStatus.container_source === 'XBEE' || $linkStatus.pocketqube_source === 'XBEE'}
+        title={$linkStatus.xbee_connected ? 'XBEE conectado' : 'XBEE desconectado'}
+      >XBEE</label>
+      <select id="xbee-port" class="command-select" bind:value={xbeePort} on:click={refreshPorts} on:change={saveSerialConfig} disabled={$commandConsole.loading}>
+        {#if availablePorts.length === 0}<option value={xbeePort}>No ports</option>{:else}{#each availablePorts as port}<option value={port}>{port}</option>{/each}{/if}
+      </select>
+      <select class="command-select" aria-label="Baudrate XBEE" bind:value={xbeeBaud} on:change={saveSerialConfig} disabled={$commandConsole.loading}>
+        {#each baudOptions as baud}<option value={baud}>{baud}</option>{/each}
+      </select>
+    </div>
   </div>
 </section>

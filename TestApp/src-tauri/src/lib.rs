@@ -18,7 +18,7 @@ pub fn run() {
             app::ui_runtime::get_telemetry,
             app::ui_runtime::reset_app,
             app::ui_runtime::send_custom_command,
-
+            app::ui_runtime::get_csv_recording_status,
             app::ui_runtime::list_serial_ports,
             app::ui_runtime::get_serial_config,
             app::ui_runtime::set_serial_config

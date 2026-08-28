@@ -65,7 +65,7 @@ Es el punto de entrada del ejecutable.
 Su única responsabilidad es arrancar la aplicación llamando a:
 
 ```rust
-testapp_lib::run()
+acrux_lib::run()
 ```
 
 ### Rol

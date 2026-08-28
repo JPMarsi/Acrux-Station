@@ -18,18 +18,32 @@ lazy_static::lazy_static! {
     static ref TELEMETRY_RECORDING_ACTIVE: Mutex<bool> = Mutex::new(false);
 }
 
+pub const CONTAINER_FILE_ID: u32 = 1;
+pub const POCKETQUBE_FILE_ID: u32 = 2;
+pub const CONTAINER_HEADER: &str = "ID,MISSION_TIME,PACKET_COUNT,COMMAND_COUNT,MODE,ALTITUDE,PRESSURE,TEMPERATURE,BATT_V,BATT_I,MECH_STATE,STATE,CMD_ECHO";
+pub const POCKETQUBE_HEADER: &str = "ID,MODE,MISSION_TIME,PACKET_COUNT,COMMAND_COUNT,ALTITUDE,TEMPERATURE,PRESSURE,VOLTAGE,CURRENT,GNSS_TIME,GNSS_ALTITUDE,GNSS_LATITUDE,GNSS_LONGITUDE,GNSS_SATS,ROT_RATE_X,ROT_RATE_Y,ROT_RATE_Z,ACCEL_X,ACCEL_Y,ACCEL_Z,MAG_X,MAG_Y,MAG_Z,SOLAR_1,SOLAR_2,MECH_STATE,CMD_ECHO,IMAGE_STABILIZATION,SCIENCE_EXP";
+
 // =========================
 // PATH
 // =========================
 
 pub fn file_path(p: &str) {
-    let mut base = BASE_PATH.lock().unwrap();
-    *base = p.to_string();
+    set_csv_output_directory(p).unwrap();
+}
 
+pub fn set_csv_output_directory(p: &str) -> Result<String, String> {
     let path = PathBuf::from(p);
     if !path.exists() {
-        fs::create_dir_all(&path).unwrap();
+        fs::create_dir_all(&path)
+            .map_err(|e| format!("No se pudo crear {}: {}", path.display(), e))?;
     }
+    if !path.is_dir() {
+        return Err(format!("{} no es una carpeta", path.display()));
+    }
+
+    let normalized = path.to_string_lossy().to_string();
+    *BASE_PATH.lock().map_err(|e| e.to_string())? = normalized.clone();
+    Ok(normalized)
 }
 
 // =========================
@@ -37,7 +51,7 @@ pub fn file_path(p: &str) {
 // =========================
 
 pub fn timestamp() -> String {
-    use chrono::{Datelike, Timelike, Local};
+    use chrono::{Datelike, Local, Timelike};
 
     let d = Local::now();
 
@@ -69,10 +83,7 @@ pub fn data_getHandle_from_json_to_csv(data: &HashMap<String, String>) -> Option
 // JSON -> TXT
 // =========================
 
-pub fn data_get_from_json_to_txt(
-    data: &HashMap<String, String>,
-    format: &str,
-) -> Option<String> {
+pub fn data_get_from_json_to_txt(data: &HashMap<String, String>, format: &str) -> Option<String> {
     if data.is_empty() {
         return None;
     }
@@ -113,12 +124,7 @@ pub fn file_csv_create(name: &str) -> String {
 // =========================
 
 pub fn file_csv_create_telemetry(id: u32, team: u32) -> String {
-    let name = format!(
-        "telemetry_team{}_id{:04}_{}.csv",
-        team,
-        id,
-        timestamp()
-    );
+    let name = format!("telemetry_team{}_id{:04}_{}.csv", team, id, timestamp());
 
     let base = BASE_PATH.lock().unwrap();
     let mut full = PathBuf::from(base.as_str());
@@ -149,6 +155,42 @@ pub fn file_csv_create_flight_telemetry(id: u32, team: u32) -> String {
         .insert(id, full.to_string_lossy().to_string());
 
     full.to_string_lossy().to_string()
+}
+
+pub fn official_flight_file_name(team: u32, payload_suffix: char) -> String {
+    format!("Flight_{}{}.csv", team, payload_suffix)
+}
+
+fn create_official_flight_file(id: u32, team: u32, suffix: char) -> Result<String, String> {
+    let name = official_flight_file_name(team, suffix);
+    let base = BASE_PATH.lock().map_err(|e| e.to_string())?;
+    let full = PathBuf::from(base.as_str()).join(name);
+
+    fs::write(&full, "").map_err(|e| format!("No se pudo crear {}: {}", full.display(), e))?;
+    TELEMETRY_FILES
+        .lock()
+        .map_err(|e| e.to_string())?
+        .insert(id, full.to_string_lossy().to_string());
+
+    Ok(full.to_string_lossy().to_string())
+}
+
+/// Inicia una mision creando simultaneamente los dos CSV oficiales 2027.
+pub fn file_csv_start_official_flight_recording(team: u32) -> Result<(String, String), String> {
+    if file_csv_is_recording() {
+        return Err("Ya existe una grabación CSV activa; detenela antes de iniciar otra".into());
+    }
+
+    let container = create_official_flight_file(CONTAINER_FILE_ID, team, 'C')?;
+    let pocketqube = create_official_flight_file(POCKETQUBE_FILE_ID, team, 'P')?;
+
+    file_csv_writeHeader_telemetry(CONTAINER_FILE_ID, CONTAINER_HEADER);
+    file_csv_writeHeader_telemetry(POCKETQUBE_FILE_ID, POCKETQUBE_HEADER);
+    *TELEMETRY_RECORDING_ACTIVE
+        .lock()
+        .map_err(|e| e.to_string())? = true;
+
+    Ok((container, pocketqube))
 }
 
 pub fn file_csv_start_recording(id: u32, team: u32, format: &str) -> Result<String, String> {
@@ -188,7 +230,7 @@ pub fn file_csv_writeHeader_telemetry(id: u32, header: &str) {
     };
 
     let mut content = header.to_string();
-    content.push('\n');
+    content.push_str("\r\n");
 
     fs::OpenOptions::new()
         .append(true)
@@ -206,14 +248,12 @@ pub fn file_csv_writeLine_telemetry(id: u32, line: &str) {
     };
 
     let mut content = line.to_string();
-    content.push('\n');
+    content.push_str("\r\n");
 
-    fs::OpenOptions::new()
+    let _ = fs::OpenOptions::new()
         .append(true)
         .open(file)
-        .unwrap()
-        .write_all(content.as_bytes())
-        .unwrap();
+        .and_then(|mut output| output.write_all(content.as_bytes()));
 }
 
 pub fn file_csv_writeLine_telemetry_if_recording(id: u32, line: &str) {
@@ -229,12 +269,10 @@ pub fn file_csv_readLine_telemetry(id: u32, line: usize) -> Option<String> {
     let file = files.get(&id)?;
 
     let content = fs::read_to_string(file).ok()?;
-    let lines: Vec<&str> = content.split('\n').collect();
+    let lines: Vec<&str> = content.lines().collect();
 
     lines.get(line).map(|s| s.to_string())
 }
-
-
 
 // --- TESTING ---
 
@@ -338,5 +376,13 @@ mod tests {
 
         assert_eq!(ts.len(), 19);
         assert!(ts.contains("_"));
+    }
+
+    #[test]
+    fn official_names_and_headers_match_2027_formats() {
+        assert_eq!(official_flight_file_name(1234, 'C'), "Flight_1234C.csv");
+        assert_eq!(official_flight_file_name(1234, 'P'), "Flight_1234P.csv");
+        assert_eq!(CONTAINER_HEADER.split(',').count(), 13);
+        assert_eq!(POCKETQUBE_HEADER.split(',').count(), 30);
     }
 }

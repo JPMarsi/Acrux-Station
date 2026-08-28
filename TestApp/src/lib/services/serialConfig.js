@@ -9,12 +9,13 @@ export async function getSerialConfig() {
 }
 
 /**
- * @param {string} port
- * @param {number} baudRate
+ * @param {{espnow_port:string, espnow_baud_rate:number, xbee_port:string, xbee_baud_rate:number}} config
  */
-export async function setSerialConfig(port, baudRate) {
+export async function setSerialConfig(config) {
   return await invoke('set_serial_config', {
-    port,
-    baudRate
+    espnowPort: config.espnow_port,
+    espnowBaudRate: config.espnow_baud_rate,
+    xbeePort: config.xbee_port,
+    xbeeBaudRate: config.xbee_baud_rate
   });
 }

@@ -1,21 +1,26 @@
 <script>
   import '../styles/dashboard.css';
   import { onMount, onDestroy } from 'svelte';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
 
-  import HeaderTeam from './HeaderTeam.svelte';
-  import AlertStrip from './AlertStrip.svelte';
-  
-  import TelemetryPanel from './TelemetryPanel.svelte';
-  import ChartsGrid from './ChartsGrid.svelte';
-  import RightSidebar from './RightSidebar.svelte';
+  import ContainerDashboard from './ContainerDashboard.svelte';
+  import PocketQubeDashboard from './PocketQubeDashboard.svelte';
 
   import {
     initTelemetry,
     destroyTelemetryListener
   } from '../services/telemetry';
 
-  onMount(() => {
-    initTelemetry();
+  let payloadView = 'container';
+
+  onMount(async () => {
+    try {
+      payloadView = getCurrentWindow().label === 'pocketqube' ? 'pocketqube' : 'container';
+    } catch {
+      // En un navegador normal se muestra Container para poder revisar el frontend.
+      payloadView = 'container';
+    }
+    await initTelemetry();
   });
 
   onDestroy(() => {
@@ -23,11 +28,8 @@
   });
 </script>
 
-<main class="dashboard">
-  <HeaderTeam />
-  <AlertStrip />
-
-  <TelemetryPanel />
-  <ChartsGrid />
-  <RightSidebar />
-</main>
+{#if payloadView === 'pocketqube'}
+  <PocketQubeDashboard />
+{:else}
+  <ContainerDashboard />
+{/if}

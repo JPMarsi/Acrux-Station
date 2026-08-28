@@ -2,76 +2,56 @@ import { writable } from 'svelte/store';
 
 const MAX_POINTS = 20;
 
-/** @typedef {{
- * labels: number[],
- * altitude: number[],
- * temperature: number[],
- * pressure: number[],
- * voltage: number[],
- * current: number[],
- * gps_altitude: number[]
- * }} TelemetryHistory
- */
-
-/** @type {TelemetryHistory} */
-const initialHistory = {
-  labels: [],
-  altitude: [],
-  temperature: [],
-  pressure: [],
-  voltage: [],
-  current: [],
-  gps_altitude: []
-};
-
-/**
- * @param {number[]} array
- * @param {number} value
- * @param {number} [max]
- */
-function pushLimited(array, value, max = MAX_POINTS) {
-  const next = [...array, Number(value ?? 0)];
-  return next.slice(-max);
+/** @param {number[]} array @param {unknown} value */
+function pushLimited(array, value) {
+  return [...array, Number(value ?? 0)].slice(-MAX_POINTS);
 }
 
-function createTelemetryHistory() {
-  /** @type {import('svelte/store').Writable<TelemetryHistory>} */
-  const store = writable(initialHistory);
-  const { subscribe, update, set } = store;
-
+function createContainerHistory() {
+  /** @type {{labels:number[], altitude:number[], temperature:number[], batt_i:number[]}} */
+  const initial = { labels: [], altitude: [], temperature: [], batt_i: [] };
+  const { subscribe, update, set } = writable(initial);
   return {
     subscribe,
-
-    reset() {
-      set(initialHistory);
-    },
-
-    /**
-     * @param {{
-     * packet_count?: number,
-     * altitude?: number,
-     * temperature?: number,
-     * pressure?: number,
-     * voltage?: number,
-     * current?: number,
-     * gps_altitude?: number
-     * }} sample
-     */
-    append(sample) {
-      update((history) => ({
-        labels: pushLimited(
-          history.labels,
-          sample.packet_count ?? history.labels.length + 1
-        ),
-        altitude: pushLimited(history.altitude, sample.altitude ?? 0),
-        temperature: pushLimited(history.temperature, sample.temperature ?? 0),
-        pressure: pushLimited(history.pressure, sample.pressure ?? 0),
-        voltage: pushLimited(history.voltage, sample.voltage ?? 0),
-        current: pushLimited(history.current, sample.current ?? 0),
-        gps_altitude: pushLimited(history.gps_altitude, sample.gps_altitude ?? 0)
-      }));
-    }
+    reset: () => set(initial),
+    /** @param {any} sample */
+    append: (sample) => update((history) => ({
+      labels: pushLimited(history.labels, sample.packet_count),
+      altitude: pushLimited(history.altitude, sample.altitude),
+      temperature: pushLimited(history.temperature, sample.temperature),
+      batt_i: pushLimited(history.batt_i, sample.batt_i)
+    }))
   };
 }
 
-export const telemetryHistory = createTelemetryHistory();
+function createPocketQubeHistory() {
+  /** @type {{labels:number[], altitude:number[], temperature:number[], voltage:number[], current:number[], rot_rate_x:number[], rot_rate_y:number[], rot_rate_z:number[], gnss_latitude:number[], gnss_longitude:number[], solar_1:number[], solar_2:number[]}} */
+  const initial = {
+    labels: [], altitude: [], temperature: [], voltage: [], current: [],
+    rot_rate_x: [], rot_rate_y: [], rot_rate_z: [], gnss_latitude: [], gnss_longitude: [],
+    solar_1: [], solar_2: []
+  };
+  const { subscribe, update, set } = writable(initial);
+  return {
+    subscribe,
+    reset: () => set(initial),
+    /** @param {any} sample */
+    append: (sample) => update((history) => ({
+      labels: pushLimited(history.labels, sample.packet_count),
+      altitude: pushLimited(history.altitude, sample.altitude),
+      temperature: pushLimited(history.temperature, sample.temperature),
+      voltage: pushLimited(history.voltage, sample.voltage),
+      current: pushLimited(history.current, sample.current),
+      rot_rate_x: pushLimited(history.rot_rate_x, sample.rot_rate_x),
+      rot_rate_y: pushLimited(history.rot_rate_y, sample.rot_rate_y),
+      rot_rate_z: pushLimited(history.rot_rate_z, sample.rot_rate_z),
+      gnss_latitude: pushLimited(history.gnss_latitude, sample.gnss_latitude),
+      gnss_longitude: pushLimited(history.gnss_longitude, sample.gnss_longitude),
+      solar_1: pushLimited(history.solar_1, sample.solar_1),
+      solar_2: pushLimited(history.solar_2, sample.solar_2)
+    }))
+  };
+}
+
+export const containerTelemetryHistory = createContainerHistory();
+export const pocketQubeTelemetryHistory = createPocketQubeHistory();

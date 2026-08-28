@@ -10,7 +10,9 @@ import random
 TEAM_ID = 1234
 
 telemetry_enabled = False
-packet_count = 0
+container_packet_count = 0
+pocketqube_packet_count = 0
+command_count = 0
 
 
 def mission_time():
@@ -18,61 +20,44 @@ def mission_time():
     return "%02d:%02d:%02d" % (t[3], t[4], t[5])
 
 
-def generate_telemetry():
-    
-    global packet_count
-    
-    packet_count += 1
-    
+def generate_container_telemetry():
+    global container_packet_count
+    container_packet_count += 1
+
     altitude = round(random.uniform(0, 1000), 1)
     temperature = round(random.uniform(10, 35), 1)
-    pressure = round(random.uniform(95, 105), 1)
+    pressure = round(random.uniform(90000, 105000))
     voltage = round(random.uniform(3.7, 4.2), 1)
-    current = round(random.uniform(0.1, 1.0), 2)
-    
-    gyro_r = round(random.uniform(-5, 5), 2)
-    gyro_p = round(random.uniform(-5, 5), 2)
-    gyro_y = round(random.uniform(-5, 5), 2)
-    
-    accel_r = round(random.uniform(-2, 2), 2)
-    accel_p = round(random.uniform(-2, 2), 2)
-    accel_y = round(random.uniform(-2, 2), 2)
-    
-    gps_time = mission_time()
-    gps_altitude = round(altitude + random.uniform(-5, 5), 1)
-    gps_lat = -33.0 + random.uniform(-0.01, 0.01)
-    gps_lon = -66.0 + random.uniform(-0.01, 0.01)
-    gps_sats = random.randint(5, 12)
-    
-    cmd_echo = "NONE"
-    
-    line = (
-        f"{TEAM_ID},"
-        f"{mission_time()},"
-        f"{packet_count},"
-        f"F,"
-        f"ASCENT,"
-        f"{altitude},"
-        f"{temperature},"
-        f"{pressure},"
-        f"{voltage},"
-        f"{current},"
-        f"{gyro_r},"
-        f"{gyro_p},"
-        f"{gyro_y},"
-        f"{accel_r},"
-        f"{accel_p},"
-        f"{accel_y},"
-        f"{gps_time},"
-        f"{gps_altitude},"
-        f"{gps_lat},"
-        f"{gps_lon},"
-        f"{gps_sats},"
-        f"{cmd_echo},,"
-        f"telemetry"
-    )
-    
-    return line
+    current = random.randint(50, 900)
+
+    fields = [
+        f"{TEAM_ID}C", str(time.ticks_ms() / 1000), str(container_packet_count),
+        str(command_count), "F", str(altitude), str(pressure), str(temperature),
+        str(voltage), str(current), "0x00", "ASCENT", "NONE"
+    ]
+    return ",".join(fields) + ",,telemetry"
+
+
+def generate_pocketqube_telemetry():
+    global pocketqube_packet_count
+    pocketqube_packet_count += 1
+
+    altitude = round(random.uniform(0, 1000), 1)
+    fields = [
+        f"{TEAM_ID}P", "F", str(time.ticks_ms() / 1000), str(pocketqube_packet_count),
+        str(command_count), str(altitude), str(round(random.uniform(10, 35), 1)),
+        str(round(random.uniform(90000, 105000))), str(round(random.uniform(3.7, 4.2), 1)),
+        str(random.randint(50, 900)), mission_time(), str(round(altitude + random.uniform(-5, 5), 1)),
+        str(-33.0 + random.uniform(-0.01, 0.01)), str(-66.0 + random.uniform(-0.01, 0.01)),
+        str(random.randint(5, 12)), str(round(random.uniform(-5, 5), 1)),
+        str(round(random.uniform(-5, 5), 1)), str(round(random.uniform(-5, 5), 1)),
+        str(round(random.uniform(-2, 2), 3)), str(round(random.uniform(-2, 2), 3)),
+        str(round(random.uniform(8, 11), 3)), str(random.randint(-500, 500)),
+        str(random.randint(-500, 500)), str(random.randint(-500, 500)),
+        str(round(random.uniform(0, 5), 2)), str(round(random.uniform(0, 5), 2)),
+        "0x00", "NONE", "STABLE", "NONE"
+    ]
+    return ",".join(fields) + ",,telemetry"
 
 
 def check_serial():
@@ -167,6 +152,7 @@ while True:
     check_serial()
     
     if telemetry_enabled:
-        print(generate_telemetry())
+        print(generate_container_telemetry())
+        print(generate_pocketqube_telemetry())
     
     time.sleep(1.0)
